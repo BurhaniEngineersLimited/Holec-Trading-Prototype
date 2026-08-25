@@ -119,7 +119,11 @@ export interface SeedResult {
 }
 
 export function buildSeed(): SeedResult {
-	const seq: Sequences = { ticket: 1004, lot: 2031, invoice: 5501, payment: 7201 };
+	// NOTE: seeded tickets already occupy TCK-1001..TCK-1006 (see below), so the
+	// next-ticket sequence must start past that range. The HTML prototype's
+	// reference seed left this at 1004, which collides with the seeded
+	// TCK-1004 the moment a new ticket is created — fixed here.
+	const seq: Sequences = { ticket: 1007, lot: 2031, invoice: 5501, payment: 7201 };
 	const events: TradeEvent[] = [];
 
 	function logEvent(lotId: string, action: string, detail?: string) {
