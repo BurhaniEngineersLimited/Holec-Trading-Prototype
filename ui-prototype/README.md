@@ -1,32 +1,82 @@
-# React + TypeScript + Vite
+# Holec ERP — UI Prototype
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A standalone frontend reference client that simulates the full Holec maize-trading
+lifecycle — **Ticket → Intake → Lot → Position → Invoiced → Settled** — with live,
+in-memory state.
 
-Currently, two official plugins are available:
+## What this is (and isn't)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+This is a **UI/UX prototype**, not the ERPNext implementation. Its job is to let
+Holec and their ERPNext developer agree on exactly how every screen should look
+and behave *before* it gets built in ERPNext. It is completely disconnected from
+any real backend, database, or ERPNext instance.
 
-## React Compiler
+- `ui-prototype/` — this project (React frontend, prototype only)
+- `holec_trading/` — the real ERPNext custom app (Frappe backend, the actual system)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+These two never share code and are never meant to be merged. `ui-prototype/`
+exists purely to validate screen design and business-rule behavior in a fast,
+disposable environment.
 
-## Expanding the Oxlint configuration
+`ui-prototype/reference/holec-erp-prototype.html` is the original single-file
+HTML prototype this project was rebuilt from. It's kept as the source of truth
+for field names, calculation logic, and copy — check it before changing any
+business rule here.
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+## Tech stack
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+Vite + React + TypeScript, Tailwind CSS v4, shadcn/ui, React Router, Zustand,
+Recharts, lucide-react.
+
+## Running locally
+
+```bash
+npm install
+npm run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Opens at `http://localhost:5173` (or the next available port).
+
+## Data & persistence
+
+Everything lives in an in-memory Zustand store (`src/store/useStore.ts`), seeded
+on load with demo suppliers, customers, and six lots spanning every stage
+(`src/lib/seed.ts`). **There is no persistence** — refreshing the page resets to
+seed data. This is intentional; do not add localStorage, IndexedDB, or a backend.
+
+## Structure
+
+```
+src/
+  types/            Domain types (Supplier, Customer, Lot, Payment, TradeEvent…)
+  lib/
+    calculations.ts Payable/transport/landed-cost/margin math — ported verbatim
+                     from the reference HTML file. Numeric parity matters here.
+    seed.ts          Seed data (suppliers, customers, lots, payments)
+    format.ts        fmtKES / fmtKg / uid / date helpers
+    nav.ts           Sidebar groups + timeline stage config
+  store/
+    useStore.ts      Central domain store + all mutating actions
+    useUiStore.ts    UI-only state (currently "active lot" for the timeline)
+  components/
+    layout/          Sidebar, Topbar, TimelineStrip, AppShell
+    shared/          TierTag, StatusBadge, DataTable, EmptyState, etc.
+    ui/              shadcn/ui primitives
+  pages/             One file per route (see App.tsx for the route list)
+```
+
+## The tier tag system
+
+Every form field carries a `TierTag`: **Native** (out-of-the-box ERPNext),
+**Configure** (ERPNext config, no code), or **Build** (needs custom
+development). This is the actual point of the prototype — it tells the ERPNext
+developer what's already available vs. what needs building, field by field.
+Keep it on every field; don't treat it as decorative.
+
+## Known intentional gaps (matching the reference)
+
+- No authentication — a static "You · Purchase User" chip in the top bar.
+- No real eTIMS or Mpesa integration — control numbers and references are
+  randomly generated on submit.
+- No Company Setup or Roles & Permissions screens — one-time admin config in
+  the real system, out of scope for a daily-use prototype.
