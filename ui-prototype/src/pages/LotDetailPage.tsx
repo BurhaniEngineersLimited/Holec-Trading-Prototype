@@ -3,7 +3,6 @@ import { CalcRow } from "@/components/shared/CalcRow";
 import { ProgressTrack } from "@/components/shared/ProgressTrack";
 import { SectionCard, SectionLabel } from "@/components/shared/SectionCard";
 import { StatusBadge } from "@/components/shared/StatusBadge";
-import { TierTag } from "@/components/shared/TierTag";
 import { Button } from "@/components/ui/button";
 import { useActiveLot } from "@/hooks/useActiveLot";
 import { computeLandedCost, computePayable, computeSale, computeTransport } from "@/lib/calculations";
@@ -84,13 +83,8 @@ export default function LotDetailPage() {
 				</>
 			)}
 
-			<SectionLabel>
-				<span className="inline-flex items-center gap-1.5">
-					Trade event log
-					<TierTag tier="B" />
-				</span>
-			</SectionLabel>
-			<SectionCard description="Append-only. No role can edit or delete these rows.">
+			<SectionLabel>Trade event log</SectionLabel>
+			<SectionCard>
 				{lotEvents.length ? (
 					<div className="divide-y">
 						{lotEvents.map((e) => (

@@ -31,7 +31,6 @@ export default function CustomersPage() {
 			<PageHeader
 				title="Customers"
 				count={customers.length}
-				description="Who we sell to — their credit terms and the quality standards they hold us to."
 			/>
 			{customers.length === 0 ? (
 				<EmptyState icon={Landmark} title="No customers yet" actionLabel="+ New customer" onAction={() => navigate("/customers/new")} />

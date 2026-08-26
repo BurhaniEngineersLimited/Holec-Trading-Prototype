@@ -10,6 +10,7 @@ import type { Lot } from "@/types";
 export default function LedgerPage() {
 	const lots = useStore((s) => s.lots);
 	const findSupplier = useStore((s) => s.findSupplier);
+	const findCustomer = useStore((s) => s.findCustomer);
 
 	const costedLots = lots.filter((l) => l.state !== "TICKET");
 	const settledLots = costedLots.filter((l) => l.state === "SETTLED");
@@ -18,12 +19,24 @@ export default function LedgerPage() {
 		? settledLots.reduce((sum, l) => sum + (computeSale(l)?.marginPerTonne ?? 0), 0) / settledLots.length
 		: 0;
 
-	const columns: Column<Lot>[] = [
+	const buyColumns: Column<Lot>[] = [
 		{ key: "ticketNo", header: "Ticket", render: (l) => <span className="font-mono text-xs">{l.ticketNo}</span> },
 		{ key: "supplier", header: "Supplier", render: (l) => findSupplier(l.supplierId)?.name ?? "—" },
 		{ key: "netPayable", header: "Net payable", className: "text-right", render: (l) => fmtKES(computePayable(l).netPayable) },
 		{ key: "transport", header: "Transport", className: "text-right", render: (l) => fmtKES(computeTransport(l).total) },
 		{ key: "landed", header: "Landed/kg", className: "text-right", render: (l) => `${fmtKES(computeLandedCost(l).perKg)}/kg` },
+		{ key: "state", header: "State", render: (l) => <StatusBadge status={l.state} /> },
+	];
+
+	const soldLots = costedLots.filter((l) => l.customerId);
+	const sellColumns: Column<Lot>[] = [
+		{ key: "ticketNo", header: "Ticket", render: (l) => <span className="font-mono text-xs">{l.ticketNo}</span> },
+		{ key: "customer", header: "Customer", render: (l) => findCustomer(l.customerId)?.name ?? "—" },
+		{ key: "sellRate", header: "Sell rate", className: "text-right", render: (l) => (l.sellRatePerKg ? `${fmtKES(l.sellRatePerKg)}/kg` : "—") },
+		{
+			key: "revenue", header: "Revenue", className: "text-right",
+			render: (l) => { const s = computeSale(l); return s ? fmtKES(s.revenue) : "—"; },
+		},
 		{
 			key: "margin", header: "Margin/tonne", className: "text-right",
 			render: (l) => { const s = computeSale(l); return s ? fmtKES(s.marginPerTonne) : "—"; },
@@ -33,10 +46,7 @@ export default function LedgerPage() {
 
 	return (
 		<div>
-			<PageHeader
-				title="Cost ledger & margin"
-				description="Every cost, tagged to a lot, traceable to its source document. This is a reporting layer over the GL — it reconciles to it, never replaces it."
-			/>
+			<PageHeader title="Cost ledger & margin" />
 
 			<div className="mb-5 grid grid-cols-1 gap-4 sm:grid-cols-3">
 				<StatCard label="Settled trades" value={String(settledLots.length)} />
@@ -44,9 +54,15 @@ export default function LedgerPage() {
 				<StatCard label="Average margin / tonne" value={fmtKES(avgMarginPerTonne)} />
 			</div>
 
-			<SectionCard title="Lot cost breakdown" description="Landed cost per kg is model-independent — comparable regardless of who technically invoiced what">
-				<DataTable data={costedLots} columns={columns} getRowId={(l) => l.id} emptyTitle="No costed lots yet." />
+			<SectionCard title="Buy — supplier cost">
+				<DataTable data={costedLots} columns={buyColumns} getRowId={(l) => l.id} emptyTitle="No costed lots yet." />
 			</SectionCard>
+
+			<div className="mt-4">
+				<SectionCard title="Sell — customer revenue">
+					<DataTable data={soldLots} columns={sellColumns} getRowId={(l) => l.id} emptyTitle="No lots sold yet." />
+				</SectionCard>
+			</div>
 		</div>
 	);
 }

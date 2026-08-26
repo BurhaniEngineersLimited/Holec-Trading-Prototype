@@ -41,7 +41,7 @@ export default function LotsPage() {
 
 	return (
 		<div>
-			<PageHeader title="Lots" count={lots.length} description="Every trade, at every stage. Click a lot to see its full history and current numbers." />
+			<PageHeader title="Lots" count={lots.length} />
 
 			<div className="mb-3 flex flex-wrap items-center gap-1.5">
 				{(["ALL", ...STAGE_ORDER] as const).map((s) => (

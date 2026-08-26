@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { TimelineStrip } from "@/components/layout/TimelineStrip";
 import { Topbar } from "@/components/layout/Topbar";
@@ -29,12 +29,15 @@ export function AppShell() {
 		return () => clearTimeout(t);
 	}, []);
 
+	const { pathname } = useLocation();
+	const showTimeline = pathname.startsWith("/lots");
+
 	return (
 		<div className="flex h-screen overflow-hidden bg-background text-foreground">
 			<Sidebar />
 			<div className="flex min-w-0 flex-1 flex-col">
 				<Topbar />
-				<TimelineStrip />
+				{showTimeline && <TimelineStrip />}
 				<main className="flex-1 overflow-y-auto">
 					<div className="mx-auto max-w-6xl px-4 py-6 sm:px-6">{loading ? <InitialLoadSkeleton /> : <Outlet />}</div>
 				</main>

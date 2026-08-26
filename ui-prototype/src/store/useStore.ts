@@ -54,6 +54,7 @@ interface StoreState {
 	) => void;
 	postDeductions: (lotId: string) => void;
 	capitaliseTransport: (lotId: string, input: { haulage: number; cess: number; offloading: number }) => void;
+	payTransporter: (lotId: string, input: { rail: PaymentRail }) => void;
 	submitSale: (lotId: string, input: { customerId: string; sellRatePerKg: number }) => void;
 	settlePayment: (lotId: string, input: { rail: PaymentRail }) => void;
 
@@ -199,7 +200,7 @@ export const useStore = create<StoreState>((set, get) => {
 			set((state) => ({
 				lots: state.lots.map((l) =>
 					l.id === lotId
-						? { ...l, haulage: input.haulage, cess: input.cess, offloading: input.offloading, state: "POSITION" as LotState }
+						? { ...l, haulage: input.haulage, cess: input.cess, offloading: input.offloading, state: "POSITION" as LotState, transportPaid: false }
 						: l,
 				),
 			}));
@@ -208,6 +209,25 @@ export const useStore = create<StoreState>((set, get) => {
 				"Transport capitalised, moved to Position",
 				`Haulage KES ${input.haulage}, cess KES ${input.cess}, offloading KES ${input.offloading}`,
 			);
+		},
+
+		payTransporter: (lotId, input) => {
+			const lot = get().findLot(lotId);
+			if (!lot || !lot.transporterId) return;
+			const amount = (lot.haulage ?? 0) + (lot.cess ?? 0);
+			const seq = get().seq;
+			const paymentId = "PAY-" + seq.payment;
+			const payment: Payment = {
+				id: paymentId, partyType: "Supplier", partyId: lot.transporterId, lotId,
+				amount, rail: input.rail, status: "Completed", daysAgo: 0,
+			};
+			set((state) => ({
+				payments: [...state.payments, payment],
+				lots: state.lots.map((l) => (l.id === lotId ? { ...l, transportPaid: true } : l)),
+				seq: { ...state.seq, payment: state.seq.payment + 1 },
+			}));
+			const transporter = get().findSupplier(lot.transporterId);
+			get().logEvent(lotId, "Transporter paid", `KES ${amount} (haulage + cess) via ${input.rail} to ${transporter?.name ?? lot.transporterId}`);
 		},
 
 		submitSale: (lotId, input) => {

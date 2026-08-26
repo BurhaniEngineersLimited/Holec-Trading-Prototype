@@ -1,18 +1,16 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface SectionCardProps {
 	title?: string;
-	description?: string;
 	children: React.ReactNode;
 }
 
-export function SectionCard({ title, description, children }: SectionCardProps) {
+export function SectionCard({ title, children }: SectionCardProps) {
 	return (
 		<Card>
-			{(title || description) && (
+			{title && (
 				<CardHeader>
-					{title && <CardTitle className="text-base">{title}</CardTitle>}
-					{description && <CardDescription>{description}</CardDescription>}
+					<CardTitle className="text-base">{title}</CardTitle>
 				</CardHeader>
 			)}
 			<CardContent>{children}</CardContent>

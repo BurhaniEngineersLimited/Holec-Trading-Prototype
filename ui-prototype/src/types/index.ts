@@ -92,6 +92,7 @@ export interface Lot {
 	haulage?: number;
 	cess?: number;
 	offloading?: number;
+	transportPaid?: boolean;
 
 	// present once sold
 	sellRatePerKg?: number | null;

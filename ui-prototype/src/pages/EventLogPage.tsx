@@ -20,7 +20,7 @@ export default function EventLogPage() {
 
 	return (
 		<div>
-			<PageHeader title="Trade event log" count={events.length} description="Append-only. No role, including System Manager, can edit or delete a row here." />
+			<PageHeader title="Trade event log" count={events.length} />
 			<SectionCard title="All events">
 				<DataTable data={rows} columns={columns} getRowId={(e) => e.id} emptyTitle="No events logged yet." />
 			</SectionCard>

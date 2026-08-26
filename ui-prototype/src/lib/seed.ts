@@ -106,6 +106,7 @@ function makeLot(opts: MakeLotOpts): Lot {
 		sellRatePerKg: opts.sellRatePerKg || null,
 		createdAt: daysAgoKE(opts.daysAgo || 0),
 		reasonCodes: [],
+		transportPaid: opts.state === "SETTLED",
 	};
 }
 

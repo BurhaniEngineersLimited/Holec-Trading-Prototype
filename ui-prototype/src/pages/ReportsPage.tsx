@@ -45,7 +45,7 @@ export default function ReportsPage() {
 
 	return (
 		<div>
-			<PageHeader title="Reports" description="The six go-live dashboards. Nothing else at launch — reports never write, only read." />
+			<PageHeader title="Reports" />
 
 			<SectionCard title="Open lots by state">
 				<div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
@@ -72,18 +72,18 @@ export default function ReportsPage() {
 			</SectionCard>
 
 			<div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
-				<SectionCard title="Payables due" description="Net payable to suppliers, less amounts already paid">
+				<SectionCard title="Payables due">
 					<CalcRow label="Total net payable" value={fmtKES(totalPayable)} />
 					<CalcRow label="Already paid" value={`− ${fmtKES(paidOut)}`} neg />
 					<CalcRow label="Outstanding" value={fmtKES(payablesDue)} total />
 				</SectionCard>
-				<SectionCard title="Receivables due" description="Invoiced but not yet settled">
+				<SectionCard title="Receivables due">
 					<CalcRow label="Invoiced, awaiting payment" value={fmtKES(receivablesDue)} total sub={`${invoicedLots.length} invoice(s)`} />
 				</SectionCard>
 			</div>
 
 			<div className="mt-4">
-				<SectionCard title="Stock on hand by lot" description="Lots currently held — costed but not yet sold">
+				<SectionCard title="Stock on hand by lot">
 					{stockByLot.length ? (
 						<Table>
 							<TableHeader>

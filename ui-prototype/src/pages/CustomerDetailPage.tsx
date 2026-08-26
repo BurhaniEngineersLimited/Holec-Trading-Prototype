@@ -79,7 +79,7 @@ export default function CustomerDetailPage() {
 			<div className="mb-4 flex items-start justify-between">
 				<div>
 					<h1 className="text-xl font-semibold tracking-tight">{isNew ? "New customer" : existing!.name}</h1>
-					<p className="text-sm text-muted-foreground">{isNew ? "Fill in details and submit for verification" : existing!.id}</p>
+					{!isNew && <p className="text-sm text-muted-foreground">{existing!.id}</p>}
 				</div>
 				{!isNew && <StatusBadge status={status} />}
 			</div>
@@ -90,10 +90,10 @@ export default function CustomerDetailPage() {
 			<SectionLabel>Basic details</SectionLabel>
 			<SectionCard>
 				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-					<FieldWrapper label="Customer name" tier="N" required error={errors.name}>
+					<FieldWrapper label="Customer name" required error={errors.name}>
 						<Input value={form.name} onChange={(e) => set("name", e.target.value)} />
 					</FieldWrapper>
-					<FieldWrapper label="Customer group" tier="N">
+					<FieldWrapper label="Customer group">
 						<Select value={form.group} onValueChange={(v) => set("group", v as Customer["group"])}>
 							<SelectTrigger className="w-full"><SelectValue placeholder="Select…" /></SelectTrigger>
 							<SelectContent>
@@ -103,10 +103,10 @@ export default function CustomerDetailPage() {
 							</SelectContent>
 						</Select>
 					</FieldWrapper>
-					<FieldWrapper label="KRA PIN" tier="N" help="Required for eTIMS invoicing">
+					<FieldWrapper label="KRA PIN">
 						<Input value={form.kraPin} onChange={(e) => set("kraPin", e.target.value)} />
 					</FieldWrapper>
-					<FieldWrapper label="Address" tier="N">
+					<FieldWrapper label="Address">
 						<Input value={form.address} onChange={(e) => set("address", e.target.value)} />
 					</FieldWrapper>
 				</div>
@@ -115,10 +115,10 @@ export default function CustomerDetailPage() {
 			<SectionLabel>Commercial terms</SectionLabel>
 			<SectionCard>
 				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-					<FieldWrapper label="Credit limit (KES)" tier="N">
+					<FieldWrapper label="Credit limit (KES)">
 						<Input type="number" value={form.creditLimit} onChange={(e) => set("creditLimit", Number(e.target.value) || 0)} />
 					</FieldWrapper>
-					<FieldWrapper label="Credit terms" tier="N">
+					<FieldWrapper label="Credit terms">
 						<Select value={form.creditTerms} onValueChange={(v) => set("creditTerms", v as Customer["creditTerms"])}>
 							<SelectTrigger className="w-full"><SelectValue placeholder="Select…" /></SelectTrigger>
 							<SelectContent>
@@ -128,25 +128,25 @@ export default function CustomerDetailPage() {
 							</SelectContent>
 						</Select>
 					</FieldWrapper>
-					<FieldWrapper label="Exposure limit (KES)" tier="C" help="Total position including undelivered">
+					<FieldWrapper label="Exposure limit (KES)">
 						<Input type="number" value={form.exposureLimit} onChange={(e) => set("exposureLimit", Number(e.target.value) || 0)} />
 					</FieldWrapper>
-					<FieldWrapper label="Guarantee / security held" tier="C" span>
+					<FieldWrapper label="Guarantee / security held" span>
 						<Input value={form.guarantee} onChange={(e) => set("guarantee", e.target.value)} />
 					</FieldWrapper>
 				</div>
 			</SectionCard>
 
 			<SectionLabel>Quality profile</SectionLabel>
-			<SectionCard description="This customer's accepted standards — feeds deductions on our side">
+			<SectionCard>
 				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-					<FieldWrapper label="Moisture rule" tier="C">
+					<FieldWrapper label="Moisture rule">
 						<Input value={form.moistureRule} onChange={(e) => set("moistureRule", e.target.value)} placeholder="e.g. 13.5% max" />
 					</FieldWrapper>
-					<FieldWrapper label="Foreign matter rule" tier="C">
+					<FieldWrapper label="Foreign matter rule">
 						<Input value={form.fmRule} onChange={(e) => set("fmRule", e.target.value)} placeholder="e.g. 2.0% max" />
 					</FieldWrapper>
-					<FieldWrapper label="Offloading borne by" tier="C" span>
+					<FieldWrapper label="Offloading borne by" span>
 						<Select value={form.offloadingBorneBy} onValueChange={(v) => set("offloadingBorneBy", v as Customer["offloadingBorneBy"])}>
 							<SelectTrigger className="w-full"><SelectValue placeholder="Select…" /></SelectTrigger>
 							<SelectContent>

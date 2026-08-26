@@ -26,7 +26,6 @@ export default function SuppliersPage() {
 			<PageHeader
 				title="Suppliers"
 				count={suppliers.length}
-				description="Farmers, aggregators, traders, and transporters. Nobody transacts until Approved."
 			/>
 			{suppliers.length === 0 ? (
 				<EmptyState

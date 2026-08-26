@@ -10,7 +10,7 @@ import LotDetailPage from "@/pages/LotDetailPage";
 import LotsPage from "@/pages/LotsPage";
 import NewTicketPage from "@/pages/NewTicketPage";
 import NotFoundPage from "@/pages/NotFoundPage";
-import PaymentsPage from "@/pages/PaymentsPage";
+import PaymentsPage, { TransporterPaymentPage } from "@/pages/PaymentsPage";
 import ReportsPage from "@/pages/ReportsPage";
 import SalesPage from "@/pages/SalesPage";
 import SupplierDetailPage from "@/pages/SupplierDetailPage";
@@ -47,6 +47,7 @@ function App() {
 				<Route path="sales/:id" element={<SalesPage />} />
 
 				<Route path="payments" element={<PaymentsPage />} />
+				<Route path="payments/transporter/:id" element={<TransporterPaymentPage />} />
 				<Route path="payments/:id" element={<PaymentsPage />} />
 
 				<Route path="ledger" element={<LedgerPage />} />

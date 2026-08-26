@@ -30,8 +30,8 @@ export default function DeductionsPage() {
 	if (!targetId) {
 		return (
 			<div>
-				<PageHeader title="Deductions & payable engine" description="Five deductions turn gross weight into a payable figure, shown step by step." />
-				<EmptyState icon={ScrollText} title="No lots waiting for payable calculation" description="A lot needs to complete intake first." />
+				<PageHeader title="Deductions & payable engine" />
+				<EmptyState icon={ScrollText} title="No lots waiting for payable calculation" />
 			</div>
 		);
 	}
@@ -64,7 +64,7 @@ export default function DeductionsPage() {
 
 	return (
 		<div>
-			<PageHeader title="Deductions & payable engine" description={`${lot.ticketNo} · ${sup?.name ?? ""} · every step traceable, no calculator needed`} />
+			<PageHeader title="Deductions & payable engine" />
 
 			{intakeLots.length > 1 && (
 				<div className="mb-4 flex flex-wrap items-center gap-1.5">
@@ -77,7 +77,7 @@ export default function DeductionsPage() {
 				</div>
 			)}
 
-			<SectionCard title="Deduction breakdown" description="From gross weight to net payable">
+			<SectionCard title="Deduction breakdown">
 				<CalcRow label="Gross weight" value={fmtKg(lot.grossKg ?? 0)} />
 				<CalcRow label="Tare weight" value={`− ${fmtKg(lot.tareKg ?? 0)}`} neg />
 				<CalcRow label="Net weight" value={fmtKg(p.netKg)} sub="Gross minus tare" />
@@ -106,8 +106,8 @@ export default function DeductionsPage() {
 			)}
 
 			<div className="mt-4">
-				<SectionCard title="Net supplier invoice" description="One invoice at net payable — the five-way split above stays in the cost ledger">
-					<FieldWrapper label="Invoice value" tier="B" span>
+				<SectionCard title="Net supplier invoice">
+					<FieldWrapper label="Invoice value" span>
 						<div className="flex h-9 items-center rounded-md border bg-muted px-3 font-mono text-sm">{fmtKES(p.netPayable)}</div>
 					</FieldWrapper>
 				</SectionCard>

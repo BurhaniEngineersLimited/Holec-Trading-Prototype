@@ -35,8 +35,8 @@ export default function TransportPage() {
 	if (!targetId) {
 		return (
 			<div>
-				<PageHeader title="Transport & loss" description="Three transport components capitalise into the lot; losses beyond tolerance are recovered." />
-				<EmptyState icon={Truck} title="No lots currently in Lot state" description="A lot needs a posted invoice first." />
+				<PageHeader title="Transport & loss" />
+				<EmptyState icon={Truck} title="No lots currently in Lot state" />
 			</div>
 		);
 	}
@@ -72,7 +72,8 @@ export default function TransportPage() {
 
 	return (
 		<div>
-			<PageHeader title="Transport & loss" description={`${lot.ticketNo} · ${sup?.name ?? ""} · ${fmtKg(expected)} in the warehouse`} />
+			<PageHeader title="Transport & loss" />
+			<p className="mb-4 -mt-3 text-sm text-muted-foreground">{lot.ticketNo} · {sup?.name}</p>
 
 			{lotLots.length > 1 && (
 				<div className="mb-4 flex flex-wrap items-center gap-1.5">
@@ -85,27 +86,27 @@ export default function TransportPage() {
 				</div>
 			)}
 
-			<SectionCard title="Transport charges" description="Always three separate lines, never one blob">
+			<SectionCard title="Transport charges">
 				<div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-					<FieldWrapper label="Haulage (KES)" tier="N">
+					<FieldWrapper label="Haulage (KES)">
 						<Input type="number" value={haulage} onChange={(e) => setHaulage(e.target.value)} />
 					</FieldWrapper>
-					<FieldWrapper label="Cess (KES)" tier="C" help={`Posts by county — ${lot.county || "not set"}`}>
+					<FieldWrapper label="Cess (KES)">
 						<Input type="number" value={cess} onChange={(e) => setCess(e.target.value)} />
 					</FieldWrapper>
-					<FieldWrapper label="Offloading (KES)" tier="N">
+					<FieldWrapper label="Offloading (KES)">
 						<Input type="number" value={offloading} onChange={(e) => setOffloading(e.target.value)} />
 					</FieldWrapper>
 				</div>
 			</SectionCard>
 
 			<div className="mt-4">
-				<SectionCard title="Loss reconciliation" description="Within 80kg tolerance is absorbed; beyond it is recovered from the transporter">
+				<SectionCard title="Loss reconciliation">
 					<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-						<FieldWrapper label="Expected quantity" tier="N">
+						<FieldWrapper label="Expected quantity">
 							<div className="flex h-9 items-center rounded-md border bg-muted px-3 font-mono text-sm">{fmtKg(expected)}</div>
 						</FieldWrapper>
-						<FieldWrapper label="Delivered quantity (kg)" tier="C" help="Adjust if less arrived than expected">
+						<FieldWrapper label="Delivered quantity (kg)">
 							<Input
 								type="number"
 								value={delivered ?? Math.round(expected)}

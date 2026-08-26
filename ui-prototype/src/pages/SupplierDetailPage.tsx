@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { Banner } from "@/components/shared/Banner";
 import { FieldWrapper } from "@/components/shared/FieldWrapper";
+import { FileUpload } from "@/components/shared/FileUpload";
 import { SectionCard, SectionLabel } from "@/components/shared/SectionCard";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Button } from "@/components/ui/button";
@@ -91,9 +92,7 @@ export default function SupplierDetailPage() {
 			<div className="mb-4 flex items-start justify-between">
 				<div>
 					<h1 className="text-xl font-semibold tracking-tight">{isNew ? "New supplier" : existing!.name}</h1>
-					<p className="text-sm text-muted-foreground">
-						{isNew ? "Fill in details and submit for verification" : `${existing!.id} · created by ${existing!.createdBy}`}
-					</p>
+					{!isNew && <p className="text-sm text-muted-foreground">{existing!.id}</p>}
 				</div>
 				{!isNew && <StatusBadge status={status} />}
 			</div>
@@ -117,10 +116,10 @@ export default function SupplierDetailPage() {
 			<SectionLabel>Basic details</SectionLabel>
 			<SectionCard>
 				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-					<FieldWrapper label="Supplier name" tier="N" required error={errors.name}>
+					<FieldWrapper label="Supplier name" required error={errors.name}>
 						<Input value={form.name} onChange={(e) => set("name", e.target.value)} />
 					</FieldWrapper>
-					<FieldWrapper label="Supplier group" tier="N" required error={errors.group}>
+					<FieldWrapper label="Supplier group" required error={errors.group}>
 						<Select value={form.group} onValueChange={(v) => set("group", v as Supplier["group"])}>
 							<SelectTrigger className="w-full"><SelectValue placeholder="Select…" /></SelectTrigger>
 							<SelectContent>
@@ -130,13 +129,19 @@ export default function SupplierDetailPage() {
 							</SelectContent>
 						</Select>
 					</FieldWrapper>
-					<FieldWrapper label="KRA PIN" tier="C" required help="Must be unique across all suppliers">
+					<FieldWrapper label="KRA PIN" required>
 						<Input value={form.kraPin} onChange={(e) => set("kraPin", e.target.value)} />
 					</FieldWrapper>
-					<FieldWrapper label="Business reg / national ID" tier="C">
+					<FieldWrapper label="KRA PIN certificate">
+						<FileUpload />
+					</FieldWrapper>
+					<FieldWrapper label="Business reg / national ID">
 						<Input value={form.idNo} onChange={(e) => set("idNo", e.target.value)} />
 					</FieldWrapper>
-					<FieldWrapper label="County" tier="C">
+					<FieldWrapper label="National ID / registration document">
+						<FileUpload />
+					</FieldWrapper>
+					<FieldWrapper label="County">
 						<Select value={form.county} onValueChange={(v) => set("county", v)}>
 							<SelectTrigger className="w-full"><SelectValue placeholder="Select…" /></SelectTrigger>
 							<SelectContent>
@@ -146,7 +151,7 @@ export default function SupplierDetailPage() {
 							</SelectContent>
 						</Select>
 					</FieldWrapper>
-					<FieldWrapper label="Physical address" tier="N">
+					<FieldWrapper label="Physical address">
 						<Input value={form.address} onChange={(e) => set("address", e.target.value)} />
 					</FieldWrapper>
 				</div>
@@ -155,7 +160,7 @@ export default function SupplierDetailPage() {
 			<SectionLabel>Compliance</SectionLabel>
 			<SectionCard>
 				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-					<FieldWrapper label="eTIMS registration status" tier="C" help="Feeds the payment interlock">
+					<FieldWrapper label="eTIMS registration status">
 						<Select value={form.etims} onValueChange={(v) => set("etims", v as Supplier["etims"])}>
 							<SelectTrigger className="w-full"><SelectValue placeholder="Select…" /></SelectTrigger>
 							<SelectContent>
@@ -165,7 +170,7 @@ export default function SupplierDetailPage() {
 							</SelectContent>
 						</Select>
 					</FieldWrapper>
-					<FieldWrapper label="VAT status" tier="C">
+					<FieldWrapper label="VAT status">
 						<Select value={form.vat} onValueChange={(v) => set("vat", v as Supplier["vat"])}>
 							<SelectTrigger className="w-full"><SelectValue placeholder="Select…" /></SelectTrigger>
 							<SelectContent>
@@ -175,7 +180,7 @@ export default function SupplierDetailPage() {
 							</SelectContent>
 						</Select>
 					</FieldWrapper>
-					<FieldWrapper label="Aflatoxin / food-safety licence on file" tier="C" span>
+					<FieldWrapper label="Aflatoxin / food-safety licence on file" span>
 						<div className="flex h-9 items-center gap-2">
 							<Checkbox checked={form.aflatoxinLicence} onCheckedChange={(v) => set("aflatoxinLicence", v === true)} />
 						</div>
@@ -186,10 +191,10 @@ export default function SupplierDetailPage() {
 			<SectionLabel>Banking</SectionLabel>
 			<SectionCard>
 				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-					<FieldWrapper label="Bank details" tier="C">
+					<FieldWrapper label="Bank details">
 						<Input value={form.bank} onChange={(e) => set("bank", e.target.value)} placeholder="Bank — account number" />
 					</FieldWrapper>
-					<FieldWrapper label="Preferred payment rail" tier="C">
+					<FieldWrapper label="Preferred payment rail">
 						<Select value={form.rail} onValueChange={(v) => set("rail", v as Supplier["rail"])}>
 							<SelectTrigger className="w-full"><SelectValue placeholder="Select…" /></SelectTrigger>
 							<SelectContent>
@@ -199,7 +204,7 @@ export default function SupplierDetailPage() {
 							</SelectContent>
 						</Select>
 					</FieldWrapper>
-					<FieldWrapper label="Transfer charge borne by" tier="C">
+					<FieldWrapper label="Transfer charge borne by">
 						<Select value={form.transferBorneBy} onValueChange={(v) => set("transferBorneBy", v as Supplier["transferBorneBy"])}>
 							<SelectTrigger className="w-full"><SelectValue placeholder="Select…" /></SelectTrigger>
 							<SelectContent>
@@ -209,12 +214,12 @@ export default function SupplierDetailPage() {
 							</SelectContent>
 						</Select>
 					</FieldWrapper>
-					<FieldWrapper label="Bank letter attached" tier="C">
+					<FieldWrapper label="Bank letter attached">
 						<div className="flex h-9 items-center gap-2">
 							<Checkbox checked={form.bankLetter} onCheckedChange={(v) => set("bankLetter", v === true)} />
 						</div>
 					</FieldWrapper>
-					<FieldWrapper label="First-payment call-back confirmed" tier="C">
+					<FieldWrapper label="First-payment call-back confirmed">
 						<div className="flex h-9 items-center gap-2">
 							<Checkbox checked={form.callbackDone} onCheckedChange={(v) => set("callbackDone", v === true)} />
 						</div>

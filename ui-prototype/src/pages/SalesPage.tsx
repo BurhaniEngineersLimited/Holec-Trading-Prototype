@@ -37,8 +37,8 @@ export default function SalesPage() {
 	if (!targetId) {
 		return (
 			<div>
-				<PageHeader title="Sale & invoicing" description="Match a lot to an approved customer, deliver, and transmit through eTIMS." />
-				<EmptyState icon={ShoppingCart} title="No lots currently held in Position" description="A lot needs its transport costs capitalised first." />
+				<PageHeader title="Sale & invoicing" />
+				<EmptyState icon={ShoppingCart} title="No lots currently held in Position" />
 			</div>
 		);
 	}
@@ -87,10 +87,8 @@ export default function SalesPage() {
 
 	return (
 		<div>
-			<PageHeader
-				title="Sale & invoicing"
-				description={`${lot.ticketNo} · from ${sup?.name ?? ""} · ${fmtKg(payable.acceptedNetKg)} available, landed at ${fmtKES(landed.perKg)}/kg`}
-			/>
+			<PageHeader title="Sale & invoicing" />
+			<p className="mb-4 -mt-3 text-sm text-muted-foreground">{lot.ticketNo} · {sup?.name} → {fmtKg(payable.acceptedNetKg)} @ {fmtKES(landed.perKg)}/kg landed</p>
 
 			{positionLots.length > 1 && (
 				<div className="mb-4 flex flex-wrap items-center gap-1.5">
@@ -103,9 +101,9 @@ export default function SalesPage() {
 				</div>
 			)}
 
-			<SectionCard title="Delivery" description="Lot consumed, delivered to customer">
+			<SectionCard title="Delivery">
 				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-					<FieldWrapper label="Customer" tier="N" required error={errors.customerId}>
+					<FieldWrapper label="Customer" required error={errors.customerId}>
 						<Select value={customerId} onValueChange={setCustomerId}>
 							<SelectTrigger className="w-full"><SelectValue placeholder="Select…" /></SelectTrigger>
 							<SelectContent>
@@ -115,7 +113,7 @@ export default function SalesPage() {
 							</SelectContent>
 						</Select>
 					</FieldWrapper>
-					<FieldWrapper label="Sell rate (KES/kg)" tier="N" required error={errors.sellRate}>
+					<FieldWrapper label="Sell rate (KES/kg)" required error={errors.sellRate}>
 						<Input type="number" value={sellRate} onChange={(e) => setSellRate(e.target.value)} />
 					</FieldWrapper>
 				</div>
@@ -129,12 +127,12 @@ export default function SalesPage() {
 			</SectionCard>
 
 			<div className="mt-4">
-				<SectionCard title="Sales invoice + eTIMS" description="Revenue and COGS post together, automatically">
+				<SectionCard title="Sales invoice + eTIMS">
 					<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-						<FieldWrapper label="Invoice number" tier="N">
+						<FieldWrapper label="Invoice number">
 							<div className="flex h-9 items-center rounded-md border bg-muted px-3 font-mono text-sm">INV-{seq.invoice}</div>
 						</FieldWrapper>
-						<FieldWrapper label="eTIMS control unit number" tier="N">
+						<FieldWrapper label="eTIMS control unit number">
 							<div className="flex h-9 items-center rounded-md border bg-muted px-3 font-mono text-sm text-muted-foreground">Generated on submit</div>
 						</FieldWrapper>
 					</div>

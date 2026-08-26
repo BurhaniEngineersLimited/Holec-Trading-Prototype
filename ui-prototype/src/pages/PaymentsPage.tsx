@@ -19,10 +19,17 @@ import type { Payment, PaymentRail } from "@/types";
 export default function PaymentsPage() {
 	const { id } = useParams<{ id: string }>();
 	const lots = useStore((s) => s.lots);
-	const lot = id ? lots.find((l) => l.id === id && l.state === "INVOICED") : undefined;
-
-	if (id && lot) return <SettleLot lotId={lot.id} />;
+	const invoicedLot = id ? lots.find((l) => l.id === id && l.state === "INVOICED") : undefined;
+	if (id && invoicedLot) return <SettleCustomer lotId={invoicedLot.id} />;
 	return <PaymentsList />;
+}
+
+export function TransporterPaymentPage() {
+	const { id } = useParams<{ id: string }>();
+	const lots = useStore((s) => s.lots);
+	const lot = id ? lots.find((l) => l.id === id) : undefined;
+	if (!lot || lot.transportPaid) return <PaymentsList />;
+	return <SettleTransporter lotId={lot.id} />;
 }
 
 function PaymentsList() {
@@ -33,6 +40,9 @@ function PaymentsList() {
 	const findCustomer = useStore((s) => s.findCustomer);
 
 	const invoicedLots = lots.filter((l) => l.state === "INVOICED");
+	const transportDueLots = lots.filter(
+		(l) => l.transporterId && l.transportPaid === false && (l.haulage || l.cess),
+	);
 
 	const columns: Column<Payment>[] = [
 		{ key: "id", header: "ID", render: (p) => <span className="font-mono text-xs">{p.id}</span> },
@@ -48,15 +58,46 @@ function PaymentsList() {
 
 	return (
 		<div>
-			<PageHeader
-				title="Payments"
-				count={payments.length}
-				description="Getting money out down the right rail, and matching money in against open invoices."
-			/>
+			<PageHeader title="Payments" count={payments.length} />
+
+			{transportDueLots.length > 0 && (
+				<>
+					<SectionLabel>Payable to transporters</SectionLabel>
+					<div className="mb-6 overflow-hidden rounded-lg border bg-card">
+						<Table>
+							<TableHeader>
+								<TableRow>
+									<TableHead>Ticket</TableHead>
+									<TableHead>Transporter</TableHead>
+									<TableHead className="text-right">Haulage</TableHead>
+									<TableHead className="text-right">Cess</TableHead>
+									<TableHead />
+								</TableRow>
+							</TableHeader>
+							<TableBody>
+								{transportDueLots.map((l) => {
+									const transporter = findSupplier(l.transporterId);
+									return (
+										<TableRow key={l.id}>
+											<TableCell className="font-mono text-xs">{l.ticketNo}</TableCell>
+											<TableCell>{transporter?.name ?? "—"}</TableCell>
+											<TableCell className="text-right">{fmtKES(l.haulage ?? 0)}</TableCell>
+											<TableCell className="text-right">{fmtKES(l.cess ?? 0)}</TableCell>
+											<TableCell>
+												<Button size="sm" onClick={() => navigate(`/payments/transporter/${l.id}`)}>Pay transporter</Button>
+											</TableCell>
+										</TableRow>
+									);
+								})}
+							</TableBody>
+						</Table>
+					</div>
+				</>
+			)}
 
 			{invoicedLots.length > 0 && (
 				<>
-					<SectionLabel>Awaiting customer payment</SectionLabel>
+					<SectionLabel>Receivable from customers</SectionLabel>
 					<div className="mb-6 overflow-hidden rounded-lg border bg-card">
 						<Table>
 							<TableHeader>
@@ -95,7 +136,7 @@ function PaymentsList() {
 	);
 }
 
-function SettleLot({ lotId }: { lotId: string }) {
+function SettleCustomer({ lotId }: { lotId: string }) {
 	const navigate = useNavigate();
 	const lot = useStore((s) => s.lots.find((l) => l.id === lotId))!;
 	const findCustomer = useStore((s) => s.findCustomer);
@@ -116,14 +157,15 @@ function SettleLot({ lotId }: { lotId: string }) {
 
 	return (
 		<div>
-			<PageHeader title="Record payment" description={`${lot.ticketNo} · ${cus?.name ?? ""} · invoice ${lot.invoiceNo}`} />
+			<PageHeader title="Record customer payment" />
+			<p className="mb-4 -mt-3 text-sm text-muted-foreground">{lot.ticketNo} · {cus?.name} · {lot.invoiceNo}</p>
 
 			<SectionCard title="Customer payment">
 				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-					<FieldWrapper label="Amount due" tier="N">
+					<FieldWrapper label="Amount due">
 						<div className="flex h-9 items-center rounded-md border bg-muted px-3 font-mono text-sm">{fmtKES(sale.revenue)}</div>
 					</FieldWrapper>
-					<FieldWrapper label="Payment rail" tier="N">
+					<FieldWrapper label="Payment rail">
 						<Select value={rail} onValueChange={(v) => setRail(v as PaymentRail)}>
 							<SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
 							<SelectContent>
@@ -137,13 +179,67 @@ function SettleLot({ lotId }: { lotId: string }) {
 			</SectionCard>
 
 			<div className="mt-4">
-				<SectionCard title="Bank reconciliation" description="Matched to the open invoice">
+				<SectionCard title="Bank reconciliation">
 					<Banner type="info">On confirmation, this receipt is matched to {lot.invoiceNo} and the lot moves to Settled.</Banner>
 				</SectionCard>
 			</div>
 
 			<div className="mt-6 flex items-center gap-2">
 				<Button onClick={handleConfirm}>Confirm receipt & settle lot</Button>
+				<Button variant="ghost" onClick={() => navigate("/payments")}>Cancel</Button>
+			</div>
+		</div>
+	);
+}
+
+function SettleTransporter({ lotId }: { lotId: string }) {
+	const navigate = useNavigate();
+	const lot = useStore((s) => s.lots.find((l) => l.id === lotId))!;
+	const findSupplier = useStore((s) => s.findSupplier);
+	const payTransporter = useStore((s) => s.payTransporter);
+	useActiveLot(lotId);
+
+	const transporter = findSupplier(lot.transporterId);
+	const amount = (lot.haulage ?? 0) + (lot.cess ?? 0);
+	const [rail, setRail] = useState<PaymentRail>("Bank Transfer");
+
+	function handleConfirm() {
+		payTransporter(lotId, { rail });
+		toast.success(`${transporter?.name ?? "Transporter"} paid ${fmtKES(amount)}`);
+		navigate("/payments");
+	}
+
+	return (
+		<div>
+			<PageHeader title="Pay transporter" />
+			<p className="mb-4 -mt-3 text-sm text-muted-foreground">{lot.ticketNo} · {transporter?.name}</p>
+
+			<SectionCard title="Transport payment">
+				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+					<FieldWrapper label="Haulage">
+						<div className="flex h-9 items-center rounded-md border bg-muted px-3 font-mono text-sm">{fmtKES(lot.haulage ?? 0)}</div>
+					</FieldWrapper>
+					<FieldWrapper label="Cess">
+						<div className="flex h-9 items-center rounded-md border bg-muted px-3 font-mono text-sm">{fmtKES(lot.cess ?? 0)}</div>
+					</FieldWrapper>
+					<FieldWrapper label="Total payable">
+						<div className="flex h-9 items-center rounded-md border bg-muted px-3 font-mono text-sm font-semibold">{fmtKES(amount)}</div>
+					</FieldWrapper>
+					<FieldWrapper label="Payment rail">
+						<Select value={rail} onValueChange={(v) => setRail(v as PaymentRail)}>
+							<SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+							<SelectContent>
+								{["Mpesa", "PesaLink", "Bank Transfer"].map((o) => (
+									<SelectItem key={o} value={o}>{o}</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					</FieldWrapper>
+				</div>
+			</SectionCard>
+
+			<div className="mt-6 flex items-center gap-2">
+				<Button onClick={handleConfirm}>Confirm payment</Button>
 				<Button variant="ghost" onClick={() => navigate("/payments")}>Cancel</Button>
 			</div>
 		</div>

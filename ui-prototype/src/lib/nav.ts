@@ -44,7 +44,7 @@ export const NAV_GROUPS: NavGroup[] = [
 		],
 	},
 	{
-		label: "Money",
+		label: "Finance",
 		items: [{ path: "/payments", label: "Payments", icon: Wallet }],
 	},
 	{

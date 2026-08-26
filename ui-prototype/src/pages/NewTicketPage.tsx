@@ -42,7 +42,7 @@ export default function NewTicketPage() {
 
 	return (
 		<div>
-			<PageHeader title="New ticket" description="Commitment logged — no stock movement, no posting yet. Only Approved suppliers can be selected." />
+			<PageHeader title="New ticket" />
 
 			{unapprovedCount > 0 && (
 				<div className="mb-4">
@@ -54,7 +54,7 @@ export default function NewTicketPage() {
 
 			<SectionCard title="Ticket details">
 				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-					<FieldWrapper label="Supplier" tier="N" required error={errors.supplierId}>
+					<FieldWrapper label="Supplier" required error={errors.supplierId}>
 						<Select value={supplierId} onValueChange={setSupplierId}>
 							<SelectTrigger className="w-full"><SelectValue placeholder="Select…" /></SelectTrigger>
 							<SelectContent>
@@ -64,7 +64,7 @@ export default function NewTicketPage() {
 							</SelectContent>
 						</Select>
 					</FieldWrapper>
-					<FieldWrapper label="Item" tier="N">
+					<FieldWrapper label="Item">
 						<Select value={item} onValueChange={setItem}>
 							<SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
 							<SelectContent>
@@ -73,10 +73,10 @@ export default function NewTicketPage() {
 							</SelectContent>
 						</Select>
 					</FieldWrapper>
-					<FieldWrapper label="Expected quantity (kg)" tier="N" required error={errors.qty}>
+					<FieldWrapper label="Expected quantity (kg)" required error={errors.qty}>
 						<Input type="number" value={qty} onChange={(e) => setQty(e.target.value)} placeholder="e.g. 8000" />
 					</FieldWrapper>
-					<FieldWrapper label="Expected delivery date" tier="N">
+					<FieldWrapper label="Expected delivery date">
 						<Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
 					</FieldWrapper>
 				</div>
