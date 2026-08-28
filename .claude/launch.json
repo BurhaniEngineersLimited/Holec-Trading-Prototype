@@ -6,6 +6,13 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["--prefix", "ui-prototype", "run", "dev"],
       "port": 5173
+    },
+    {
+      "name": "holec-erpnext-local",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": ["-c", "cd $HOME/frappe-bench && bench start"],
+      "port": 8001,
+      "url": "http://localhost:8001"
     }
   ]
 }

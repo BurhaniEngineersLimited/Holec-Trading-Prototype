@@ -3,24 +3,44 @@
 export type Tier = "N" | "C" | "B";
 
 export type SupplierGroup = "Farmer" | "Aggregator" | "Trader" | "Transporter";
+export type SupplierType = "Company" | "Individual";
 export type PartyStatus = "Draft" | "Verified" | "Approved";
 export type PaymentRail = "Mpesa" | "PesaLink" | "Bank Transfer" | "Cash";
 export type EtimsStatus = "Registered" | "Buyer-Generated" | "Blocked";
 export type VatStatus = "Registered" | "Not registered";
 export type TransferBorneBy = "Supplier" | "Us";
 
+export interface ContactPerson {
+	name: string;
+	role: string;
+	phone: string;
+	sameAsPhone: boolean;
+	whatsapp: string;
+	email: string;
+	isPrimary: boolean;
+}
+
 export interface Supplier {
 	id: string;
 	name: string;
 	group: SupplierGroup | "";
+	supplierType: SupplierType;
+	contactPersons: ContactPerson[];
 	kraPin: string;
 	idNo: string;
 	county: string;
+	area: string;
 	address: string;
 	etims: EtimsStatus | "";
 	vat: VatStatus | "";
 	aflatoxinLicence: boolean;
-	bank: string;
+	bankName: string;
+	bankCode: string;
+	branch: string;
+	branchCode: string;
+	swiftCode: string;
+	accountNumber: string;
+	accountName: string;
 	bankLetter: boolean;
 	callbackDone: boolean;
 	rail: PaymentRail | "";
