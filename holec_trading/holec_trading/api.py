@@ -5,7 +5,7 @@
 import frappe
 from frappe import _
 
-from holec_trading.holec_trading.ocr import OcrUnavailable, extract_fields_from_image
+from holec_trading.ocr import OcrUnavailable, extract_fields_from_image
 
 KRA_PIN_PROMPT = (
 	"This is a photo or scan of a Kenya Revenue Authority (KRA) PIN certificate. "
